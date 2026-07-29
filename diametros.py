@@ -170,7 +170,7 @@ for nombre, feret in ferets.items():
     print(f'Moda     = {ajustes[nombre]["moda"]:.2f} nm')
 #%% Histogramas + ajuste lognormal
 
-fig, axs = plt.subplots(3, 3, figsize=(12, 10), constrained_layout=True)
+fig, axs = plt.subplots(3, 3, figsize=(12, 12), constrained_layout=True)
 axs = axs.ravel()
 
 colores = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5','C6', 'C7', 'C8', 'C9']
@@ -254,7 +254,7 @@ print('Resultados_lognormal_Feret.txt')
 
 #%% Comparación de todas las muestras
 
-fig, axs = plt.subplots(2, 1, figsize=(9,8), sharex=True, constrained_layout=True)
+fig, axs = plt.subplots(2, 1, figsize=(10,8), sharex=True, constrained_layout=True)
 colores = ['C0','C1','C2','C3','C4','C5','C6','C7','C8','C9']
 
 ax_hist = axs[0]
