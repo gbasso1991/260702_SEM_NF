@@ -226,13 +226,11 @@ for i in [6, 7, 8]:
 
 plt.suptitle(
     'Distribuciones de diámetros Feret y ajuste lognormal',
-    fontsize=16
-)
+    fontsize=16)
 
 plt.savefig(
     'Distribuciones_Feret_lognormal_M1_M2_M3_M4_M5_M6_M7_M9_M10.png',
-    dpi=300
-)
+    dpi=300)
 
 plt.show()
 #%% Guardar resultados del ajuste
@@ -310,3 +308,309 @@ plt.suptitle('Comparación de las distribuciones de diámetros Feret',
 plt.savefig('Comparacion_Feret_lognormal_M1_M2_M3_M4_M5_M6_M7_M9_M10.png', dpi=300)
 plt.show()
 # %%
+#%% Diámetro medio por muestra
+
+fig, ax = plt.subplots(figsize=(6,3), constrained_layout=True)
+
+muestras = list(ajustes.keys())
+
+media = [ajustes[m]['media'].n for m in muestras]
+dmedia = [ajustes[m]['media'].s for m in muestras]
+
+colores = [f'C{i}' for i in range(len(muestras))]
+
+for i, (m, y, dy, c) in enumerate(zip(muestras, media, dmedia, colores)):
+    ax.errorbar(
+        i, y,
+        yerr=dy,
+        fmt='.',
+        ms=8,
+        capsize=5,
+        color=c,
+        ecolor=c,
+        elinewidth=2,
+        label=f'{y:.1f}')
+
+ax.set_xticks(range(len(muestras)))
+ax.set_xticklabels(muestras)
+# ax.legend(frameon=True)
+ax.set_ylabel('Diámetro medio (nm)')
+ax.set_xlabel('Muestra')
+# ax.set_title('Diámetro medio obtenido del ajuste lognormal')
+
+ax.grid(axis='y', alpha=0.3)
+
+plt.savefig('Diametro_medio_por_muestra.png', dpi=300)
+plt.show()
+# %%
+#%% Comparación del diámetro medio y la dispersión
+
+fig, axs = plt.subplots(
+    2, 1,
+    figsize=(7, 5),
+    sharex=True,
+    constrained_layout=True
+)
+
+colores = ['C0','C1','C2','C3','C4','C5','C6','C7','C8']
+
+muestras = list(ajustes.keys())
+
+media = [ajustes[m]['media'].n for m in muestras]
+dmedia = [ajustes[m]['media'].s for m in muestras]
+
+std = [ajustes[m]['std'].n for m in muestras]
+dstd = [ajustes[m]['std'].s for m in muestras]
+
+# ------------------------
+# Diámetro medio
+# ------------------------
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    axs[0].errorbar(
+        i,
+        media[i],
+        yerr=dmedia[i],
+        fmt='.',
+        ms=8,
+        color=c,
+        capsize=4
+    )
+
+axs[0].set_ylabel(r'$\langle d\rangle$ (nm)')
+axs[0].set_title('Diámetro medio ⟨d⟩ ',loc='left')
+axs[0].grid(alpha=0.3)
+
+# ------------------------
+# Desviación estándar
+# ------------------------
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    axs[1].errorbar(
+        i,
+        std[i],
+        yerr=dstd[i],
+        fmt='.',
+        ms=8,
+        color=c,
+        capsize=4
+    )
+
+axs[1].set_ylabel(r'$\sigma$ (nm)')
+axs[1].set_title('Dispersión de tamaños σ   ',loc='left')
+axs[1].grid(alpha=0.3)
+
+axs[1].set_xticks(range(len(muestras)))
+axs[1].set_xticklabels(muestras)
+
+#plt.suptitle('Comparación de las distribuciones lognormales', fontsize=16)
+
+plt.savefig('Diametro_medio_y_dispersion.png',dpi=300)
+
+plt.show()
+# %% Para plotear en funcion del diametro
+
+# Diámetros medios (Feret) con incerteza del ajuste lognormal [1, 2]
+# Formato: ufloat(media, error_ajuste)
+diam_medio = np.array([
+    ufloat(250.6, 3.6),   # M1
+    ufloat(225.9, 3.6),   # M2
+    ufloat(184.2, 1.8),   # M3
+    ufloat(88.1, 1.8),    # M4
+    ufloat(109.8, 1.1),   # M5
+    ufloat(162.8, 1.5),   # M9
+    ufloat(85.8, 0.6)     # M10
+])
+# Diámetros medios (Feret) con incerteza del ajuste lognormal [1, 2]
+# Formato: ufloat(media, error_ajuste)
+diam_medio = np.array([
+    ufloat(250.6, 3.6),   # M1
+    ufloat(225.9, 3.6),   # M2
+    ufloat(184.2, 1.8),   # M3
+    ufloat(88.1, 1.8),    # M4
+    ufloat(109.8, 1.1),   # M5
+    ufloat(162.8, 1.5),   # M9
+    ufloat(85.8, 0.6)     # M10
+])
+
+# ESAR (W/g) a 300 kHz y ~58 kA/m [3-9]
+# Nota: La incerteza para M1-M5 y M9-M10 es la desviación estándar de las 3 repeticiones.
+esar = np.array([
+    ufloat(210, 13),      # M1
+    ufloat(720, 31),      # M2
+    ufloat(1235, 11),     # M3
+    ufloat(1179, 47),     # M4
+    ufloat(1327, 14),     # M5
+    ufloat(613.5, 29.0),  # M9 
+    ufloat(1648, 16)      # M10
+])
+
+# Tiempo de relajación tau (ns) [3-9]
+tau = np.array([
+    ufloat(37, 8),        # M1
+    ufloat(75, 3),        # M2
+    ufloat(56.3, 0.6),    # M3
+    ufloat(137, 15),      # M4
+    ufloat(116, 6),       # M5
+    ufloat(47.35, 0.07),    # M9
+    ufloat(115.7, 1.2)    # M10
+])
+
+# Campo coercitivo dinámico Hc (kA/m) [3-9]
+hc = np.array([
+    ufloat(7.5, 0.6),     # M1
+    ufloat(12.01, 0.14),  # M2
+    ufloat(9.79, 0.11),   # M3
+    ufloat(18.7, 0.9),    # M4
+    ufloat(16.9, 0.3),    # M5
+    ufloat(8.63, 0.01),   # M9
+    ufloat(16.33, 0.16)   # M10
+])
+# %%
+#%% ESAR vs diámetro
+
+from uncertainties import unumpy as unp
+
+muestras = ['M1', 'M2', 'M3', 'M4', 'M5', 'M9', 'M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+
+# diámetro medio obtenido del ajuste lognormal
+diam = np.array([ajustes[m]['media'].n for m in muestras])
+ddiam = np.array([ajustes[m]['media'].s for m in muestras])
+
+fig, ax = plt.subplots(figsize=(6,4), constrained_layout=True)
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    ax.errorbar(
+        diam[i],
+        unp.nominal_values(esar)[i],
+        xerr=ddiam[i],
+        yerr=unp.std_devs(esar)[i],
+        fmt='.',
+        color=c,
+        ms=8,
+        capsize=4
+    )
+
+    ax.annotate(
+        m,
+        (diam[i], unp.nominal_values(esar)[i]),
+        xytext=(5,5),
+        textcoords='offset points',
+        color=c
+    )
+
+ax.set_xlabel('Diámetro medio (nm)')
+ax.set_ylabel('ESAR (W/g)')
+ax.set_title('ESAR vs diámetro')
+ax.grid(alpha=0.3)
+
+plt.show()
+# %%
+#%% ESAR vs diámetro
+
+from uncertainties import unumpy as unp
+
+muestras = ['M1', 'M2', 'M3', 'M4', 'M5', 'M9', 'M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+
+# diámetro medio obtenido del ajuste lognormal
+diam = np.array([ajustes[m]['media'].n for m in muestras])
+ddiam = np.array([ajustes[m]['media'].s for m in muestras])
+
+fig1, ax = plt.subplots(figsize=(6,3), constrained_layout=True)
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    ax.errorbar(
+        diam[i],
+        unp.nominal_values(esar)[i],
+        xerr=ddiam[i],
+        yerr=unp.std_devs(esar)[i],
+        fmt='.',
+        color=c,
+        ms=8,
+        capsize=4
+    )
+
+    ax.annotate(
+        m,
+        (diam[i], unp.nominal_values(esar)[i]),
+        xytext=(5,5),
+        textcoords='offset points',
+        color=c
+    )
+
+ax.set_xlabel('Diámetro medio (nm)')
+ax.set_ylabel('ESAR (W/g)')
+ax.set_title('ESAR vs diámetro')
+ax.grid(alpha=0.3)
+
+plt.show()
+# %%
+fig2, ax = plt.subplots(figsize=(6,3), constrained_layout=True)
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    ax.errorbar(
+        diam[i],
+        unp.nominal_values(tau)[i],
+        xerr=ddiam[i],
+        yerr=unp.std_devs(tau)[i],
+        fmt='.',
+        color=c,
+        ms=8,
+        capsize=4
+    )
+
+    ax.annotate(
+        m,
+        (diam[i], unp.nominal_values(tau)[i]),
+        xytext=(5,5),
+        textcoords='offset points',
+        color=c
+    )
+
+ax.set_xlabel('Diámetro medio (nm)')
+ax.set_ylabel('tau (ns)')
+ax.set_title('tau vs diámetro')
+ax.grid(alpha=0.3)
+
+plt.show()
+# %%
+
+
+fig3, ax = plt.subplots(figsize=(6,3), constrained_layout=True)
+
+for i, (m, c) in enumerate(zip(muestras, colores)):
+    ax.errorbar(
+        diam[i],
+        unp.nominal_values(hc)[i],
+        xerr=ddiam[i],
+        yerr=unp.std_devs(hc)[i],
+        fmt='.',
+        color=c,
+        ms=8,
+        capsize=4
+    )
+
+    ax.annotate(
+        m,
+        (diam[i], unp.nominal_values(hc)[i]),
+        xytext=(5,5),
+        textcoords='offset points',
+        color=c
+    )
+
+ax.set_xlabel('Diámetro medio (nm)')
+ax.set_ylabel('Hc (kA/m)')
+ax.set_title('Hc vs diámetro')
+ax.grid(alpha=0.3)
+
+plt.show()
+# %%
+fig1.savefig('ESAR_vs_diam.png',dpi=300)
+fig2.savefig('tau_vs_diam.png',dpi=300)
+fig3.savefig('Hc_vs_diam.png',dpi=300)
+
+# %%
+
+
