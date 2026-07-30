@@ -78,6 +78,7 @@ def ajuste_lognormal_bootstrap(datos, n_boot=1000):
 
     N = len(datos)
 
+    q16, q84 = lognorm.ppf([0.16, 0.84], shape, loc=loc, scale=scale)
     for i in range(n_boot):
         muestra = np.random.choice(datos, N, replace=True)
         s, l, sc = lognorm.fit(muestra, floc=0)
@@ -90,7 +91,9 @@ def ajuste_lognormal_bootstrap(datos, n_boot=1000):
         'media': ufloat(media, medias.std(ddof=1)),
         'std': ufloat(std, stds.std(ddof=1)),
         'mediana': mediana,
-        'moda': moda}
+        'moda': moda,
+        'q16':q16,
+        'q84':q84}
 
 #%%  Tablas de resultados
 res_M1 = glob("copias_mejoradas/medidas/M1_*.csv")
@@ -170,51 +173,67 @@ for nombre, feret in ferets.items():
     print(f'Moda     = {ajustes[nombre]["moda"]:.2f} nm')
 #%% Histogramas + ajuste lognormal
 
-fig, axs = plt.subplots(3, 3, figsize=(12, 12), constrained_layout=True)
+#%% Histogramas + ajuste lognormal
+
+fig, axs = plt.subplots(3, 3, figsize=(13, 13), constrained_layout=True)
 axs = axs.ravel()
 
-colores = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5','C6', 'C7', 'C8', 'C9']
+colores = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8']
 
 for ax, (nombre, feret), c in zip(axs, ferets.items(), colores):
 
     bins = np.histogram_bin_edges(feret, bins='fd')
 
-    ax.hist(feret,bins=bins,density=True,alpha=0.5,color=c,edgecolor='k',label='Datos')
+    # Histograma
+    ax.hist(feret,bins=bins,density=True,
+        alpha=0.5,color=c,edgecolor='k',label=f'{nombre}   N={len(feret)}'    )
 
-    x = np.linspace(bins[0], bins[-1], 600)
+    # Curva ajustada
+    x = np.linspace(bins[0], bins[-1], 1000)
 
-    ax.plot(x, lognorm.pdf(x,
-            ajustes[nombre]['shape'],
-            ajustes[nombre]['loc'],
-            ajustes[nombre]['scale']),
-        'r',lw=1.5,label='Lognormal')
+    pdf = lognorm.pdf(x,
+        ajustes[nombre]['shape'],
+        ajustes[nombre]['loc'],
+        ajustes[nombre]['scale'])
 
-    ax.text(
-        0.97,
-        0.97,
-        f'⟨d⟩ = {ajustes[nombre]["media"]:.1uS} nm\n'
-        f'σ = {ajustes[nombre]["std"]:.1uS} nm',
-        transform=ax.transAxes,
-        ha='right',
-        va='top',
-        fontsize=10,
-        bbox=dict(facecolor='white', alpha=0.9))
+    ax.axvspan(
+        ajustes[nombre]['q16'],
+        ajustes[nombre]['q84'],
+        color=c,
+        alpha=0.2,zorder=-1)
 
-    ax.set_title(f'{nombre}   N={len(feret)}', loc='left')
-    ax.legend(loc='upper left')
+    # Curva lognormal
+    ax.plot(x,pdf,color='k',
+        lw=1.5,
+        label=f'⟨d⟩ = {ajustes[nombre]["media"]:.1uS} nm\n'
+              f'σ = {ajustes[nombre]["std"]:.1uS} nm'    )
 
-    
-axs[0].set_ylabel('Densidad (nm$^{-1}$)')
-axs[3].set_ylabel('Densidad (nm$^{-1}$)')
-axs[6].set_ylabel('Densidad (nm$^{-1}$)')
-axs[6].set_xlabel('Diámetro Feret (nm)')
-axs[7].set_xlabel('Diámetro Feret (nm)')
-axs[8].set_xlabel('Diámetro Feret (nm)')
+    # Diámetro medio
+    ax.axvline(
+        ajustes[nombre]['media'].n,
+        color=c,
+        ls='--',
+        lw=2)
+
+    ax.legend(loc='upper left',shadow=True,frameon=True )
+
+# Etiquetas
+for i in [0, 3, 6]:
+    axs[i].set_ylabel('Densidad (nm$^{-1}$)')
+
+for i in [6, 7, 8]:
+    axs[i].set_xlabel('Diámetro Feret (nm)')
 
 plt.suptitle(
     'Distribuciones de diámetros Feret y ajuste lognormal',
-    fontsize=16)
-plt.savefig('Distribuciones_Feret_lognormal_M1_M2_M3_M4_M5_M6_M7_M9_M10.png', dpi=300)
+    fontsize=16
+)
+
+plt.savefig(
+    'Distribuciones_Feret_lognormal_M1_M2_M3_M4_M5_M6_M7_M9_M10.png',
+    dpi=300
+)
+
 plt.show()
 #%% Guardar resultados del ajuste
 
