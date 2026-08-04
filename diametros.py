@@ -421,17 +421,6 @@ diam_medio = np.array([
     ufloat(162.8, 1.5),   # M9
     ufloat(85.8, 0.6)     # M10
 ])
-# Diámetros medios (Feret) con incerteza del ajuste lognormal [1, 2]
-# Formato: ufloat(media, error_ajuste)
-diam_medio = np.array([
-    ufloat(250.6, 3.6),   # M1
-    ufloat(225.9, 3.6),   # M2
-    ufloat(184.2, 1.8),   # M3
-    ufloat(88.1, 1.8),    # M4
-    ufloat(109.8, 1.1),   # M5
-    ufloat(162.8, 1.5),   # M9
-    ufloat(85.8, 0.6)     # M10
-])
 
 # ESAR (W/g) a 300 kHz y ~58 kA/m [3-9]
 # Nota: La incerteza para M1-M5 y M9-M10 es la desviación estándar de las 3 repeticiones.
@@ -465,6 +454,16 @@ hc = np.array([
     ufloat(16.9, 0.3),    # M5
     ufloat(8.5, 0.2),     # M9
     ufloat(16.33, 0.35)   # M10
+])
+
+wr = np.array([
+    ufloat(0.19, 0.01),   # M1
+    ufloat(0.38, 0.01),   # M2
+    ufloat(0.30, 0.01),   # M3
+    ufloat(0.55, 0.01),   # M4   
+    ufloat(0.48, 0.01),   # M5
+    ufloat(0.19, 0.01),   # M9   
+    ufloat(0.54, 0.01)    # M10
 ])
 # %%
 #%% ESAR vs diámetro
@@ -576,8 +575,6 @@ ax.grid(alpha=0.3)
 
 plt.show()
 # %%
-
-
 fig3, ax = plt.subplots(figsize=(6,3), constrained_layout=True)
 
 for i, (m, c) in enumerate(zip(muestras, colores)):
@@ -611,6 +608,304 @@ fig1.savefig('ESAR_vs_diam.png',dpi=300)
 fig2.savefig('tau_vs_diam.png',dpi=300)
 fig3.savefig('Hc_vs_diam.png',dpi=300)
 
+
+#%% Grafico barras tau
+
+valores = np.array([t.n for t in tau])
+errores = np.array([t.s for t in tau])
+
+# Figura tau
+
+labels = ['M1','M2','M3','M4','M5','M9','M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+fig, ax = plt.subplots(figsize=(11,6), constrained_layout=True)
+
+x = np.arange(len(labels))
+for i, (label, valor, error, color) in enumerate(zip(labels, valores, errores, colores)):
+    ax.bar(x=x[i], height=valor, yerr=error, color=color, edgecolor='k',linewidth=0,capsize=6)
+
+# Etiquetas arriba de cada barra
+for xi, yi, ei, t in zip(x, valores, errores, tau):
+    ax.text(xi,yi + ei + 2,
+        f'${t:.2uS}$',ha='center',
+        va='bottom',fontsize=13)
+
+ax.set_ylabel('Tau (ns)', fontsize=15)
+ax.set_ylim(0, 165)
+
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=13)
+ax.grid(axis='y', ls='-', alpha=0.5)
+
+# Agrupaciones
+# Línea inferior NF@cit
+ax.plot([x[0]-0.05, x[5]+0.05], [-16,-16], color='k', clip_on=False,lw=1.0)
+ax.text((x[0]+x[5])/2,-18,'NF@cit',ha='center',va='top',fontsize=16)
+
+# Línea inferior M10
+ax.plot([x[6]-0.35, x[6]+0.35], [-16,-16], color='k', clip_on=False,lw=1)
+
+ax.text(x[6],-18,'NF@PAA',
+    ha='center',va='top',fontsize=15)
+
+# Título
+fig.suptitle(r'tiempos de relajación $\tau$ (ns)',
+    fontsize=20)
+
+plt.savefig('tau_vs_muestra.png',dpi=300)
+plt.show()
+
+# %% Grafico barras ESAR
+valores = np.array([e.n for e in esar])
+errores = np.array([e.s for e in esar])
+
+labels = ['M1','M2','M3','M4','M5','M9','M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+
+fig, ax = plt.subplots(figsize=(11,6), constrained_layout=True)
+
+x = np.arange(len(labels))
+
+for i, (label, valor, error, color) in enumerate(zip(labels, valores, errores, colores)):
+    ax.bar(
+        x=x[i],
+        height=valor,
+        yerr=error,
+        color=color,
+        edgecolor='k',
+        linewidth=0,
+        capsize=6
+    )
+
+for xi, yi, ei, e in zip(x, valores, errores, esar):
+    ax.text(
+        xi,
+        yi + ei + 20,
+        f'${e:.2uS}$',
+        ha='center',
+        va='bottom',
+        fontsize=13
+    )
+
+ax.set_ylabel('ESAR (W/g)', fontsize=15)
+ax.set_ylim(0, 1450)
+
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=13)
+
+ax.grid(axis='y', ls='-', alpha=0.5)
+
+
+ax.plot([x[0]-0.05, x[5]+0.05], [-140,-140],
+        color='k', clip_on=False, lw=1)
+
+ax.text((x[0]+x[5])/2, -170,
+        'NF@cit',
+        ha='center',
+        va='top',
+        fontsize=16)
+
+ax.plot([x[6]-0.35, x[6]+0.35], [-140,-140],
+        color='k', clip_on=False, lw=1)
+
+ax.text(x[6], -170,
+        'NF@PAA',
+        ha='center',
+        va='top',
+        fontsize=15)
+
+# ==========================================================
+# Título
+# ==========================================================
+
+fig.suptitle('ESAR (W/g)', fontsize=20)
+
+plt.savefig('ESAR_vs_muestra.png', dpi=300)
+plt.show()
+#%% Figura Campo Coercitivo
+
+labels = ['M1','M2','M3','M4','M5','M9','M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+
+fig, ax = plt.subplots(figsize=(11,6), constrained_layout=True)
+
+x = np.arange(len(labels))
+
+for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
+    ax.bar(
+        x=x[i],
+        height=valor,
+        yerr=error,
+        color=color,
+        edgecolor='k',
+        linewidth=0,
+        capsize=6    )
+
+for xi, yi, ei, h in zip(x, valores, errores, hc):
+    ax.text(
+        xi,
+        yi + ei + 0.1,
+        f'${h:.2uS}$',
+        ha='center',
+        va='bottom',
+        fontsize=13
+    )
+
+ax.set_ylabel(r'$H_c$ (kA/m)', fontsize=15)
+ax.set_ylim(0, max(valores + errores)*1.15)
+
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=13)
+
+ax.grid(axis='y', ls='-', alpha=0.5)
+
+y_line = -1.5
+y_text = -1.8
+
+ax.plot([x[0]-0.05, x[5]+0.05], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax.text((x[0]+x[5])/2, y_text,
+        'NF@cit',
+        ha='center',
+        va='top',
+        fontsize=16)
+
+ax.plot([x[6]-0.35, x[6]+0.35], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax.text(x[6], y_text,
+        'NF@PAA',
+        ha='center',
+        va='top',
+        fontsize=15)
+
+# ==========================================================
+# Título
+# ==========================================================
+
+fig.suptitle(r'Campo coercitivo $H_c$', fontsize=20)
+
+plt.savefig('Hc_vs_muestra.png', dpi=300)
+plt.show()
+#%% Diametros y dispersiones
+# ==========================================================
+diametros = [ufloat(d,e) for d,e in zip(diam,ddiam)]
+valores = np.array([d.n for d in diametros])
+errores = np.array([d.s for d in diametros])
+
+desviacion = [ufloat(s,ds) for s,ds in zip(std,dstd)]
+valores2 = np.array([des.n for des in desviacion])
+errores2 = np.array([des.s for des in desviacion])
+
+labels = ['M1','M2','M3','M4','M5','M9','M10']
+colores = ['C0','C1','C2','C3','C4','C5','C6']
+
+fig, (ax,ax2) = plt.subplots(2,1,figsize=(11,9), sharex=True,constrained_layout=True)
+
+x = np.arange(len(labels))
+
+for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
+    ax.bar(
+        x=x[i],
+        height=valor,
+        yerr=error,
+        color=color,
+        edgecolor='k',
+        linewidth=0,
+        capsize=6
+    )
+for xi, yi, ei, d in zip(x, valores, errores, diametros):
+    ax.text(
+        xi,
+        yi + ei + 2,
+        f'${d:.1uS}$',
+        ha='center',
+        va='bottom',
+        fontsize=13
+    )
+
+for i, (valor, error, color) in enumerate(zip(valores2, errores2, colores)):
+    ax2.bar(
+        x=x[i],
+        height=valor,
+        yerr=error,
+        color=color,
+        edgecolor='k',
+        linewidth=0,
+        capsize=6
+    )
+for xi, yi, ei, d in zip(x, valores2, errores2, desviacion):
+    ax2.text(
+        xi,
+        yi + ei+0.5 ,
+        f'${d:.1uS}$',
+        ha='center',
+        va='bottom',
+        fontsize=13
+    )
+
+
+ax.set_ylabel('Diámetro medio (nm)', fontsize=15)
+ax2.set_ylabel('Dispersion de tamaños (nm)', fontsize=15)
+
+ax.set_ylim(0, max(valores + errores)*1.15)
+ax2.set_ylim(0, max(valores2 + errores2)*1.15)
+
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=13)
+
+ax.grid(axis='y', ls='-', alpha=0.5)
+ax2.grid(axis='y', ls='-', alpha=0.5)
+
+y_line = -5
+y_text = -6
+
+ax2.plot([x[0]-0.05, x[5]+0.05], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax2.text((x[0]+x[5])/2, y_text,
+        'NF@cit',
+        ha='center',
+        va='top',
+        fontsize=16)
+
+ax2.plot([x[6]-0.35, x[6]+0.35], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax2.text(x[6], y_text,
+        'NF@PAA',
+        ha='center',
+        va='top',
+        fontsize=15)
+plt.savefig('diametro_medio_vs_muestra.png', dpi=300)
+plt.show()
+# %% Warming Rate
+fig, ax = plt.subplots(figsize=(11,6), constrained_layout=True)
+
+for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
+    ax.bar(
+        i,
+        valor,
+        yerr=error,
+        color=color,
+        edgecolor='k',
+        capsize=6
+    )
+
+for xi, yi, ei, w in zip(range(len(muestras)), valores, errores, wr):
+    ax.text(
+        xi,
+        yi + ei + 0.05,
+        f'${w:.2uS}$',
+        ha='center'
+    )
+
+ax.set_ylabel('Warming rate (°C/s)')
+ax.set_xticks(range(len(muestras)))
+ax.set_xticklabels(muestras)
+
+plt.show()
+
+
 # %%
-
-
