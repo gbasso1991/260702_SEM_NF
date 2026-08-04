@@ -441,8 +441,8 @@ esar = np.array([
     ufloat(1235, 11),     # M3
     ufloat(1179, 47),     # M4
     ufloat(1327, 14),     # M5
-    ufloat(613.5, 29.0),  # M9 
-    ufloat(1648, 16)      # M10
+    ufloat(360,  10),     # M9 
+    ufloat(1258, 48)      # M10
 ])
 
 # Tiempo de relajación tau (ns) [3-9]
@@ -452,8 +452,8 @@ tau = np.array([
     ufloat(56.3, 0.6),    # M3
     ufloat(137, 15),      # M4
     ufloat(116, 6),       # M5
-    ufloat(47.35, 0.07),    # M9
-    ufloat(115.7, 1.2)    # M10
+    ufloat(47.0, 2.0),    # M9
+    ufloat(115.7, 3.1)    # M10
 ])
 
 # Campo coercitivo dinámico Hc (kA/m) [3-9]
@@ -463,8 +463,8 @@ hc = np.array([
     ufloat(9.79, 0.11),   # M3
     ufloat(18.7, 0.9),    # M4
     ufloat(16.9, 0.3),    # M5
-    ufloat(8.63, 0.01),   # M9
-    ufloat(16.33, 0.16)   # M10
+    ufloat(8.5, 0.2),     # M9
+    ufloat(16.33, 0.35)   # M10
 ])
 # %%
 #%% ESAR vs diámetro
