@@ -457,13 +457,13 @@ hc = np.array([
 ])
 
 wr = np.array([
-    ufloat(0.19, 0.01),   # M1
-    ufloat(0.38, 0.01),   # M2
-    ufloat(0.30, 0.01),   # M3
-    ufloat(0.55, 0.01),   # M4   
-    ufloat(0.48, 0.01),   # M5
-    ufloat(0.19, 0.01),   # M9   
-    ufloat(0.54, 0.01)    # M10
+    ufloat(0.26, 0.02),   # M1
+    ufloat(2.21, 0.10),   # M2
+    ufloat(4.44, 0.21),   # M3
+    ufloat(1.80, 0.18),   # M4   
+    ufloat(4.31, 0.16),   # M5
+    ufloat(1.07, 0.05),   # M9   
+    ufloat(6.0, 0.33)    # M10
 ])
 # %%
 #%% ESAR vs diámetro
@@ -881,6 +881,9 @@ ax2.text(x[6], y_text,
 plt.savefig('diametro_medio_vs_muestra.png', dpi=300)
 plt.show()
 # %% Warming Rate
+
+valores = np.array([d.n for d in wr])
+errores = np.array([d.s for d in wr])
 fig, ax = plt.subplots(figsize=(11,6), constrained_layout=True)
 
 for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
@@ -896,15 +899,38 @@ for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
 for xi, yi, ei, w in zip(range(len(muestras)), valores, errores, wr):
     ax.text(
         xi,
-        yi + ei + 0.05,
-        f'${w:.2uS}$',
+        yi + ei + 0.1,
+        f'${w:.1uS}$',
         ha='center'
     )
 
 ax.set_ylabel('Warming rate (°C/s)')
-ax.set_xticks(range(len(muestras)))
-ax.set_xticklabels(muestras)
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=13)
+ax.set_ylim(0, max(valores + errores)*1.15)
 
+
+y_line = -0.5
+y_text = -0.8
+ax.grid(axis='y', ls='-', alpha=0.5)
+ax.plot([x[0]-0.05, x[5]+0.05], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax.text((x[0]+x[5])/2, y_text,
+        'NF@cit',
+        ha='center',
+        va='top',
+        fontsize=16)
+
+ax.plot([x[6]-0.35, x[6]+0.35], [y_line, y_line],
+        color='k', clip_on=False, lw=1)
+
+ax.text(x[6], y_text,
+        'NF@PAA',
+        ha='center',
+        va='top',
+        fontsize=15)
+plt.savefig('warming_rate_vs_muestra.png', dpi=300)
 plt.show()
 
 
