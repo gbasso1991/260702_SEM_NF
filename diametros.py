@@ -724,6 +724,9 @@ plt.savefig('ESAR_vs_muestra.png', dpi=300)
 plt.show()
 #%% Figura Campo Coercitivo
 
+
+valores = np.array([e.n for e in hc])
+errores = np.array([e.s for e in hc])
 labels = ['M1','M2','M3','M4','M5','M9','M10']
 colores = ['C0','C1','C2','C3','C4','C5','C6']
 
@@ -744,8 +747,8 @@ for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
 for xi, yi, ei, h in zip(x, valores, errores, hc):
     ax.text(
         xi,
-        yi + ei + 0.1,
-        f'${h:.2uS}$',
+        yi + ei + 0.2,
+        f'${h:.1uS}$',
         ha='center',
         va='bottom',
         fontsize=13
@@ -759,33 +762,37 @@ ax.set_xticklabels(labels, fontsize=13)
 
 ax.grid(axis='y', ls='-', alpha=0.5)
 
-y_line = -1.5
-y_text = -1.8
+# y_line = 0
+# y_text = -10
 
-ax.plot([x[0]-0.05, x[5]+0.05], [y_line, y_line],
-        color='k', clip_on=False, lw=1)
+# ax.plot([x[0]-0.05, x[5]+0.05], [y_line, y_line],
+#         color='k', clip_on=False, lw=1)
 
-ax.text((x[0]+x[5])/2, y_text,
-        'NF@cit',
-        ha='center',
-        va='top',
-        fontsize=16)
+# ax.text((x[0]+x[5])/2, y_text,
+#         'NF@cit',
+#         ha='center',
+#         va='top',
+#         fontsize=16)
 
-ax.plot([x[6]-0.35, x[6]+0.35], [y_line, y_line],
-        color='k', clip_on=False, lw=1)
+# ax.plot([x[6]-0.35, x[6]+0.35], [y_line, y_line],
+#         color='k', clip_on=False, lw=1)
 
-ax.text(x[6], y_text,
-        'NF@PAA',
-        ha='center',
-        va='top',
-        fontsize=15)
+# ax.text(x[6], y_text,
+#         'NF@PAA',
+#         ha='center',
+#         va='top',
+#         fontsize=15)
 
-# ==========================================================
-# Título
-# ==========================================================
+# Agrupaciones
+# Línea inferior NF@cit
+ax.plot([x[0]-0.05, x[5]+0.05], [-1.5,-1.5], color='k', clip_on=False,lw=1.0)
+ax.text((x[0]+x[5])/2,-2,'NF@cit',ha='center',va='top',fontsize=16)
+
+# Línea inferior M10
+ax.plot([x[6]-0.35, x[6]+0.35], [-1.5,-1.5], color='k', clip_on=False,lw=1)
+ax.text(x[6],-2,'NF@PAA',ha='center',va='top',fontsize=15)
 
 fig.suptitle(r'Campo coercitivo $H_c$', fontsize=20)
-
 plt.savefig('Hc_vs_muestra.png', dpi=300)
 plt.show()
 #%% Diametros y dispersiones
@@ -893,6 +900,7 @@ for i, (valor, error, color) in enumerate(zip(valores, errores, colores)):
         yerr=error,
         color=color,
         edgecolor='k',
+        linewidth=0,
         capsize=6
     )
 
@@ -930,8 +938,9 @@ ax.text(x[6], y_text,
         ha='center',
         va='top',
         fontsize=15)
+plt.title('Warming rate (°C/s)', fontsize=20)
 plt.savefig('warming_rate_vs_muestra.png', dpi=300)
-plt.show()
+plt.show()s
 
 
 # %%
