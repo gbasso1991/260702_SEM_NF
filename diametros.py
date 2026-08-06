@@ -233,6 +233,75 @@ plt.savefig(
     dpi=300)
 
 plt.show()
+#%%
+
+#%% Distribución y ajuste lognormal individual por muestra
+
+colores = ['C0','C1','C2','C3','C4','C5','C6','C7','C8']
+
+for (nombre, feret), c in zip(ferets.items(), colores):
+
+    fig, ax = plt.subplots(figsize=(7,4), constrained_layout=True)
+
+    # Histograma
+    bins = np.histogram_bin_edges(feret, bins='fd')
+
+    ax.hist(
+        feret,
+        bins=bins,
+        density=True,
+        alpha=0.5,
+        color=c,
+        edgecolor='k',
+        label=f'{nombre}   N={len(feret)}'
+    )
+
+    # Curva ajustada
+    x = np.linspace(bins[0], bins[-1], 1000)
+
+    pdf = lognorm.pdf(
+        x,
+        ajustes[nombre]['shape'],
+        ajustes[nombre]['loc'],
+        ajustes[nombre]['scale']
+    )
+
+    # Intervalo central 68 %
+    ax.axvspan(
+        ajustes[nombre]['q16'],
+        ajustes[nombre]['q84'],
+        color=c,
+        alpha=0.2,
+        zorder=-1
+    )
+
+    # Ajuste lognormal
+    ax.plot(
+        x,
+        pdf,
+        color='k',
+        lw=2,
+        label=f'⟨d⟩ = {ajustes[nombre]["media"]:.1uS} nm\n'
+              f' σ = {ajustes[nombre]["std"]:.1uS} nm'
+    )
+
+    # Diámetro medio
+    ax.axvline(
+        ajustes[nombre]['media'].n,
+        color=c,
+        ls='--',
+        lw=2
+    )
+
+    ax.set_xlabel('Diámetro Feret (nm)')
+    ax.set_ylabel(r'Densidad')
+    ax.set_title(f'{nombre}')
+    ax.grid(alpha=0.3)
+
+    ax.legend(loc='upper left', frameon=True, shadow=True)
+
+    plt.savefig(f'{nombre}_Distribucion_Feret_lognormal.png', dpi=300)
+    plt.show()
 #%% Guardar resultados del ajuste
 
 resultados = []
