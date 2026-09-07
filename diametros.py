@@ -496,7 +496,7 @@ diam_medio = np.array([
 esar = np.array([
     ufloat(210, 13),      # M1
     ufloat(720, 31),      # M2
-    ufloat(1235, 11),     # M3
+    ufloat(513, 11),     # M3
     ufloat(1179, 47),     # M4
     ufloat(1327, 14),     # M5
     ufloat(360,  10),     # M9 
@@ -1009,7 +1009,7 @@ ax.text(x[6], y_text,
         fontsize=15)
 plt.title('Warming rate (°C/s)', fontsize=20)
 plt.savefig('warming_rate_vs_muestra.png', dpi=300)
-plt.show()s
+plt.show()
 
 
 # %%
